@@ -1,0 +1,6 @@
+[package]
+name = "tinamou"
+version = "0.1.0"
+authors = ["Autopawn <franciscojacb@gmail.com>"]
+
+[dependencies]
