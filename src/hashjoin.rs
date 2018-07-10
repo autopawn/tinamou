@@ -9,19 +9,6 @@ use std::collections::HashMap;
 
 /// Extension trait for hashjoin.
 pub trait HashJoin<D: Data> {
-    // TODO: Update this doc:
-    /// Returns a new instance of `self` containing only records satisfying `predicate`.
-    ///
-    /// #Examples
-    /// ```
-    /// use timely::dataflow::operators::{ToStream, Filter, Inspect};
-    ///
-    /// timely::example(|scope| {
-    ///     (0..10).to_stream(scope)
-    ///            .filter(|x| *x % 2 == 0)
-    ///            .inspect(|x| println!("seen: {:?}", x));
-    /// });
-    /// ```
     fn hash_join(&self, &Self, joinvars_a: Vec<usize>, joinvars_b: Vec<usize>) -> Self;
 }
 
