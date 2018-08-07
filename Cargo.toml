@@ -5,3 +5,4 @@ authors = ["Autopawn <franciscojacb@gmail.com>"]
 
 [dependencies]
 timely="*"
+hyper="0.10.5"

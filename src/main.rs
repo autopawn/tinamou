@@ -1,13 +1,19 @@
 extern crate timely;
+extern crate hyper;
 
 mod hashjoin;
 
+use std::io::{BufRead, BufReader};
+
 use timely::dataflow::operators::Inspect;
-use hashjoin::HashJoin;
-// use timely::dataflow::operators::generic::operator::source;
 use timely::dataflow::operators::ToStream;
+use hashjoin::HashJoin; // Own hashjoin operator.
+
+use hyper::Client;
+use hyper::Url;
 
 fn map2str(strs : Vec<&str>) -> Vec<String> {
+    // Creates a vector of String from a vector of references to constant strs.
     let mut st : Vec<String> = Vec::new();
     for val in strs {
         st.push(String::from(val));
@@ -16,9 +22,47 @@ fn map2str(strs : Vec<&str>) -> Vec<String> {
 }
 
 fn main() {
-    println!("Hello, world!");
 
     timely::example(|scope| {
+
+        let query1 = "
+        select distinct ?person ?name ?city where {
+          ?person rdf:type foaf:Person .
+          ?person foaf:name ?name .
+          ?city rdf:type schema:City .
+          ?city foaf:name ?name
+        } LIMIT 1000
+        "; // Persons that have the same name than a city.
+
+        let query2 = "
+        select distinct ?city ?hospital where {
+          ?city rdf:type schema:City .
+          ?hospital rdf:type schema:Hospital .
+          ?hospital dbp:location ?city .
+        } LIMIT 1000
+        "; // Hospitals and their cities.
+
+        let mut url = Url::parse("http://dbpedia.org/sparql").unwrap();
+        url.query_pairs_mut().append_pair("default-graph-uri","http://dbpedia.org");
+        url.query_pairs_mut().append_pair("format","text/csv");
+        url.query_pairs_mut().append_pair("CXML_redir_for_subjs","121");
+        url.query_pairs_mut().append_pair("CXML_redir_for_hrefs","");
+        url.query_pairs_mut().append_pair("timeout","30000");
+        url.query_pairs_mut().append_pair("debug","on");
+        url.query_pairs_mut().append_pair("run","+Run+Query+");
+        url.query_pairs_mut().append_pair("query",query1);
+
+        // Create a http client using hyper:
+        let client = Client::new();
+
+        let res = client.get(url).send().unwrap();
+        assert_eq!(res.status, hyper::Ok);
+
+        for line in BufReader::new(res).lines() {
+            println!("{}", line.unwrap());
+        }
+
+
 
         // let stream_1 = source(scope, "tables", move |capability| {
         //     let mut table: Vec<Vec<String>> = Vec::new();
