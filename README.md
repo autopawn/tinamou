@@ -3,6 +3,15 @@
 An example of a timely-dataflow operator to perform hash joins on tables
 originated from SPARQL queries to dbpedia.
 
+# Execution
+
+To execute the test simply run:
+```
+cargo run
+```
+the cargo binary should be in the PATH, after [installing rust](https://www.rust-lang.org/en-US/install.html).
+
+
 # Conclusions
 
 ## Usage of the timely-dataflow library
